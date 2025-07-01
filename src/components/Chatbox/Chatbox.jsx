@@ -139,12 +139,12 @@ const Chatbox = () => {
 
 
     return chatUser ? (
-        <div className={`chat-box ${chatVisible? "" : "hidden"}`}>
+        <div className={`chat-box ${chatVisible ? "" : "hidden"}`}>
             <div className="chat-user">
                 <img src={chatUser.userData.avatar} alt="" />
-                <p>{chatUser.userData.name} {Date.now()-chatUser.userData.lastSeen <=70000 ? <img className='dot' src={assets.green_dot} alt="" /> : null}</p>
+                <p>{chatUser.userData.name} {Date.now() - chatUser.userData.lastSeen <= 70000 ? <img className='dot' src={assets.green_dot} alt="" /> : null}</p>
                 <img src={assets.help_icon} className='help' alt="" />
-                <img onClick={()=>setChatVisible(false)} src={assets.arrow_icon} className='arrow' alt="" />
+                <img onClick={() => setChatVisible(false)} src={assets.arrow_icon} className='arrow' alt="" />
             </div>
 
             <div className="chat-msg">
@@ -166,7 +166,13 @@ const Chatbox = () => {
 
 
             <div className="chat-input">
-                <input onChange={(e) => setInput(e.target.value)} value={input} type="text" placeholder='Send a message' />
+                <input onChange={(e) => setInput(e.target.value)} value={input} type="text" placeholder="Send a message" onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            sendMessage();
+                        }
+                    }}
+                />
                 <input onChange={sendImage} type="file" id='image' accept='image/png, image/jpeg ' hidden />
                 <label htmlFor="image">
                     <img src={assets.gallery_icon} alt="" />
@@ -176,7 +182,7 @@ const Chatbox = () => {
         </div>
     )
         :
-        <div className={`chat-welcome ${chatVisible? "" : "hidden"}`}>
+        <div className={`chat-welcome ${chatVisible ? "" : "hidden"}`}>
 
         </div>
 }
