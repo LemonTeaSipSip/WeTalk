@@ -57,6 +57,14 @@ const Chatbox = () => {
     }
 
     const sendImage = async (e) => {
+
+        const file = e.target.files[0];
+
+        // ✅ Pre-check file size before uploading
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error("File size exceeds 10MB limit.");
+            return;
+        }
         try {
             const fileUrl = await upload(e.target.files[0]);
 
@@ -92,7 +100,7 @@ const Chatbox = () => {
 
             }
         } catch (error) {
-            toast.error(error, message)
+            toast.error(error.message)
         }
     }
 
@@ -167,11 +175,11 @@ const Chatbox = () => {
 
             <div className="chat-input">
                 <input onChange={(e) => setInput(e.target.value)} value={input} type="text" placeholder="Send a message" onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            sendMessage();
-                        }
-                    }}
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                }}
                 />
                 <input onChange={sendImage} type="file" id='image' accept='image/png, image/jpeg ' hidden />
                 <label htmlFor="image">

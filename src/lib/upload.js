@@ -1,23 +1,25 @@
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
 const upload = async (file) => {
+    if (!file) {
+        throw new Error("No file selected.");
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+        throw new Error("File size exceeds the 10MB limit.");
+    }
 
     const storage = getStorage();
     const storageRef = ref(storage, `images/${Date.now() + file.name}`);
 
     const uploadTask = uploadBytesResumable(storageRef, file);
 
-
     return new Promise((resolve, reject) => {
-
-        // Register three observers:    
-        // 1. 'state_changed' observer, called any time the state changes
-        // 2. Error observer, called on failure
-        // 3. Completion observer, called on successful completion
-        uploadTask.on('state_changed',
+        uploadTask.on(
+            'state_changed',
             (snapshot) => {
-                // Observe state change events such as progress, pause, and resume
-                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 console.log('Upload is ' + progress + '% done');
                 switch (snapshot.state) {
@@ -30,19 +32,15 @@ const upload = async (file) => {
                 }
             },
             (error) => {
-                // Handle unsuccessful uploads
+                reject(error); // Handle upload errors
             },
             () => {
-                // Handle successful uploads on complete
-                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    resolve(downloadURL)
+                    resolve(downloadURL);
                 });
             }
         );
-
-    })
-
-}
+    });
+};
 
 export default upload;
